@@ -88,6 +88,8 @@ function renderVisited(idx) {
     const c = CITIES[i];
     const li = document.createElement("li");
     li.innerHTML = `<span class="flag">${c.flag}</span><span>${c.name}(${c.country})</span>`;
+    li.classList.add("clickable");
+    li.addEventListener("click", () => showArrivalModal(c));
     els.visitedList.appendChild(li);
   }
 }

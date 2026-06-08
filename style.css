@@ -107,6 +107,9 @@ main { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
   font-size: 0.95rem;
 }
 .visited-list li .flag { font-size: 1.4rem; }
+.visited-list li.clickable { cursor: pointer; transition: background 0.15s ease; }
+.visited-list li.clickable:hover { background: rgba(255,255,255,1); }
+.visited-list li.clickable:active { background: #f0e6d2; }
 
 .modal-overlay {
   position: fixed;
