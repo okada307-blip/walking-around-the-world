@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2b5d6b">
+<title>Walking Around the World</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>🧳 Walking Around the World</h1>
+    </header>
+
+    <main>
+      <section class="passport-card">
+        <div class="current-city">
+          <span class="flag" id="current-flag">🇯🇵</span>
+          <div>
+            <div class="city-name" id="current-city-name">宮崎</div>
+            <div class="city-country" id="current-city-country">日本</div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="next-city-label">次の都市: 台北まで</span>
+            <span id="progress-numbers">0 / 8000 歩</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+      </section>
+
+      <section class="stats-row">
+        <div class="stat-box">
+          <div class="stat-value" id="today-steps">0</div>
+          <div class="stat-label">今日の歩数</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="total-steps">0</div>
+          <div class="stat-label">累計歩数</div>
+        </div>
+      </section>
+
+      <section class="controls">
+        <button id="enable-sensor-btn" class="btn primary">📡 歩数センサーを有効にする</button>
+        <button id="manual-step-btn" class="btn secondary">👟 手動で歩数を追加(+100歩)</button>
+        <p class="hint" id="sensor-status">センサー: 未使用(手動カウント中)</p>
+      </section>
+
+      <section class="visited">
+        <h2>📍 これまで訪れた都市</h2>
+        <ul id="visited-list" class="visited-list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <!-- 到着演出モーダル -->
+  <div class="modal-overlay" id="arrival-modal">
+    <div class="modal-card">
+      <div class="stamp">🛂 到着スタンプ</div>
+      <div class="flag big" id="arrival-flag">🌍</div>
+      <h2 id="arrival-city-name">City</h2>
+      <p class="arrival-country" id="arrival-country">Country</p>
+
+      <div class="info-block">
+        <h3>🏛 観光地</h3>
+        <p id="arrival-sights"></p>
+      </div>
+      <div class="info-block">
+        <h3>🍽 名物料理</h3>
+        <p id="arrival-food"></p>
+      </div>
+      <div class="info-block">
+        <h3>💬 現地の言葉</h3>
+        <p id="arrival-phrase"></p>
+      </div>
+
+      <button id="close-modal-btn" class="btn primary">旅を続ける</button>
+    </div>
+  </div>
+
+  <script src="cities.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

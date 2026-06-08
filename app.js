@@ -1,0 +1,185 @@
+const STORAGE_KEY = "watw_state_v1";
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const today = new Date().toISOString().slice(0, 10);
+  if (!raw) {
+    return { totalSteps: 0, cityIndex: 0, lastDate: today, todaySteps: 0 };
+  }
+  const state = JSON.parse(raw);
+  if (state.lastDate !== today) {
+    state.lastDate = today;
+    state.todaySteps = 0;
+  }
+  return state;
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+// --- DOM refs ---
+const els = {
+  currentFlag: document.getElementById("current-flag"),
+  currentCityName: document.getElementById("current-city-name"),
+  currentCityCountry: document.getElementById("current-city-country"),
+  nextCityLabel: document.getElementById("next-city-label"),
+  progressNumbers: document.getElementById("progress-numbers"),
+  progressFill: document.getElementById("progress-fill"),
+  todaySteps: document.getElementById("today-steps"),
+  totalSteps: document.getElementById("total-steps"),
+  visitedList: document.getElementById("visited-list"),
+  enableSensorBtn: document.getElementById("enable-sensor-btn"),
+  manualStepBtn: document.getElementById("manual-step-btn"),
+  sensorStatus: document.getElementById("sensor-status"),
+  modal: document.getElementById("arrival-modal"),
+  arrivalFlag: document.getElementById("arrival-flag"),
+  arrivalCityName: document.getElementById("arrival-city-name"),
+  arrivalCountry: document.getElementById("arrival-country"),
+  arrivalSights: document.getElementById("arrival-sights"),
+  arrivalFood: document.getElementById("arrival-food"),
+  arrivalPhrase: document.getElementById("arrival-phrase"),
+  closeModalBtn: document.getElementById("close-modal-btn"),
+};
+
+// 各都市に到達するまでの累積歩数しきい値を計算
+const cumulativeThresholds = (() => {
+  let sum = 0;
+  return CITIES.map((c, i) => {
+    if (i === 0) return 0;
+    sum += c.stepsToReach;
+    return sum;
+  });
+})();
+
+function render() {
+  const idx = Math.min(state.cityIndex, CITIES.length - 1);
+  const current = CITIES[idx];
+  els.currentFlag.textContent = current.flag;
+  els.currentCityName.textContent = current.name;
+  els.currentCityCountry.textContent = current.country;
+  els.todaySteps.textContent = state.todaySteps.toLocaleString();
+  els.totalSteps.textContent = state.totalSteps.toLocaleString();
+
+  if (idx >= CITIES.length - 1) {
+    els.nextCityLabel.textContent = "🎉 世界一周達成!宮崎に帰着しました";
+    els.progressNumbers.textContent = `合計 ${state.totalSteps.toLocaleString()} 歩`;
+    els.progressFill.style.width = "100%";
+  } else {
+    const next = CITIES[idx + 1];
+    const fromThreshold = cumulativeThresholds[idx];
+    const toThreshold = cumulativeThresholds[idx + 1];
+    const span = toThreshold - fromThreshold;
+    const progressed = Math.max(0, state.totalSteps - fromThreshold);
+    const pct = Math.min(100, (progressed / span) * 100);
+    els.nextCityLabel.textContent = `次の都市: ${next.name}まで`;
+    els.progressNumbers.textContent = `${progressed.toLocaleString()} / ${span.toLocaleString()} 歩`;
+    els.progressFill.style.width = pct + "%";
+  }
+
+  renderVisited(idx);
+}
+
+function renderVisited(idx) {
+  els.visitedList.innerHTML = "";
+  for (let i = idx; i >= 0; i--) {
+    const c = CITIES[i];
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="flag">${c.flag}</span><span>${c.name}(${c.country})</span>`;
+    els.visitedList.appendChild(li);
+  }
+}
+
+function showArrivalModal(city) {
+  els.arrivalFlag.textContent = city.flag;
+  els.arrivalCityName.textContent = city.name;
+  els.arrivalCountry.textContent = city.country;
+  els.arrivalSights.textContent = city.sights.join(" / ");
+  els.arrivalFood.textContent = city.food.join(" / ");
+  els.arrivalPhrase.textContent = `${city.phrase.text}(${city.phrase.reading}) — ${city.phrase.meaning}`;
+  els.modal.classList.add("show");
+}
+
+els.closeModalBtn.addEventListener("click", () => {
+  els.modal.classList.remove("show");
+});
+
+function addSteps(amount) {
+  state.totalSteps += amount;
+  state.todaySteps += amount;
+
+  // 都市到達チェック(複数都市を一気に通過する場合にも対応)
+  while (
+    state.cityIndex < CITIES.length - 1 &&
+    state.totalSteps >= cumulativeThresholds[state.cityIndex + 1]
+  ) {
+    state.cityIndex += 1;
+    showArrivalModal(CITIES[state.cityIndex]);
+  }
+
+  saveState();
+  render();
+}
+
+els.manualStepBtn.addEventListener("click", () => addSteps(100));
+
+// --- 歩数センサー(加速度計のピーク検出) ---
+let sensorActive = false;
+let lastPeakTime = 0;
+let smoothed = 9.8;
+const ACCEL_THRESHOLD = 1.3; // ピーク判定の感度
+const MIN_STEP_INTERVAL_MS = 280; // 連続ステップの最小間隔
+
+function handleMotion(event) {
+  const acc = event.accelerationIncludingGravity;
+  if (!acc) return;
+  const magnitude = Math.sqrt(
+    (acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2
+  );
+  // 簡易ローパスフィルタで重力成分を推定
+  smoothed = smoothed * 0.9 + magnitude * 0.1;
+  const deviation = magnitude - smoothed;
+
+  const now = Date.now();
+  if (deviation > ACCEL_THRESHOLD && now - lastPeakTime > MIN_STEP_INTERVAL_MS) {
+    lastPeakTime = now;
+    addSteps(1);
+  }
+}
+
+async function enableSensor() {
+  if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+    try {
+      const result = await DeviceMotionEvent.requestPermission();
+      if (result !== "granted") {
+        els.sensorStatus.textContent = "センサー: 許可されませんでした(手動カウントを使用してください)";
+        return;
+      }
+    } catch (e) {
+      els.sensorStatus.textContent = "センサー: 許可リクエストに失敗しました(手動カウントを使用してください)";
+      return;
+    }
+  }
+
+  if (typeof DeviceMotionEvent === "undefined") {
+    els.sensorStatus.textContent = "センサー: この端末では利用できません(手動カウントを使用してください)";
+    return;
+  }
+
+  window.addEventListener("devicemotion", handleMotion);
+  sensorActive = true;
+  els.sensorStatus.textContent = "センサー: 有効(歩くと自動で歩数が増えます)";
+  els.enableSensorBtn.disabled = true;
+  els.enableSensorBtn.textContent = "📡 センサー有効中";
+}
+
+els.enableSensorBtn.addEventListener("click", enableSensor);
+
+render();
+
+// --- PWA: Service Worker登録(任意・失敗しても無視) ---
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
