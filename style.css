@@ -94,6 +94,19 @@ main { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
 .btn.primary { background: #d96c4a; color: #fff; }
 .btn.secondary { background: #2b5d6b; color: #fff; }
 .hint { font-size: 0.8rem; color: #777; text-align: center; }
+.sync-badge {
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e8e0d0;
+  color: #666;
+}
+.sync-badge.synced {
+  background: #d4edda;
+  color: #2d6a4f;
+  font-weight: 600;
+}
 
 .visited h2 { color: #fff; font-size: 1.05rem; margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .visited-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
