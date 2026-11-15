@@ -66,11 +66,44 @@
         <p class="hint" id="sensor-status">センサー: 未使用(手動カウント中)</p>
       </section>
 
+      <section class="map-section">
+        <h2>🗺 世界地図</h2>
+        <div id="map-container" class="map-container">
+          <svg id="world-map-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </section>
+
       <section class="visited">
         <h2>📍 これまで訪れた都市</h2>
         <ul id="visited-list" class="visited-list"></ul>
       </section>
     </main>
+  </div>
+
+  <!-- 地図ポップアップ -->
+  <div class="map-popup" id="map-popup">
+    <div class="map-popup-card">
+      <button id="popup-close-btn" class="popup-close">✕</button>
+      <div class="popup-header">
+        <span class="flag" id="popup-flag">🌍</span>
+        <div>
+          <div class="city-name" id="popup-name"></div>
+          <div class="city-country" id="popup-country"></div>
+        </div>
+      </div>
+      <div class="info-block">
+        <h3>🏛 観光地</h3>
+        <p id="popup-sights"></p>
+      </div>
+      <div class="info-block">
+        <h3>🍽 名物料理</h3>
+        <p id="popup-food"></p>
+      </div>
+      <div class="info-block">
+        <h3>💬 現地の言葉</h3>
+        <p id="popup-phrase"></p>
+      </div>
+    </div>
   </div>
 
   <!-- 到着演出モーダル -->
@@ -99,6 +132,7 @@
   </div>
 
   <script src="cities.js"></script>
+  <script src="map.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

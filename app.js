@@ -114,6 +114,7 @@ function render() {
   }
 
   renderVisited(idx);
+  buildMap(idx);
 }
 
 function renderVisited(idx) {
