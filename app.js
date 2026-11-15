@@ -174,6 +174,29 @@ function checkHealthSync() {
 
 checkHealthSync();
 
+// --- 進捗引き継ぎ ---
+const migrateInput = document.getElementById("migrate-input");
+const migrateBtn = document.getElementById("migrate-btn");
+
+migrateBtn.addEventListener("click", () => {
+  const val = parseInt(migrateInput.value, 10);
+  if (isNaN(val) || val < 0) {
+    migrateInput.style.borderColor = "#d96c4a";
+    return;
+  }
+  if (!confirm(`累計歩数を ${val.toLocaleString()} 歩に設定します。現在のデータは上書きされます。よろしいですか?`)) return;
+  migrateInput.style.borderColor = "";
+  state.baseSteps = val;
+  state.todaySteps = 0;
+  state.totalSteps = val;
+  state.cityIndex = cityIndexFromSteps(val);
+  state.healthSynced = false;
+  saveState();
+  render();
+  migrateInput.value = "";
+  alert("引き継ぎ完了しました!");
+});
+
 // --- ヘルスケア手動入力 ---
 const healthInput = document.getElementById("health-input");
 const healthSubmitBtn = document.getElementById("health-submit-btn");

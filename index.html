@@ -47,6 +47,13 @@
       <section class="controls">
         <p id="sync-badge" class="sync-badge">📲 未同期(手動カウント中)</p>
         <div class="health-input-row">
+          <label class="health-label">📦 進捗を引き継ぐ</label>
+          <div class="health-row">
+            <input type="number" id="migrate-input" placeholder="累計歩数を入力 例: 199990" inputmode="numeric" min="0">
+            <button id="migrate-btn" class="btn secondary small">設定</button>
+          </div>
+        </div>
+        <div class="health-input-row">
           <label class="health-label">🍎 今日の歩数を入力</label>
           <div class="health-row">
             <input type="number" id="health-input" placeholder="例: 8432" inputmode="numeric" min="0">
