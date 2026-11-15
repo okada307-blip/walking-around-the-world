@@ -174,6 +174,26 @@ function checkHealthSync() {
 
 checkHealthSync();
 
+// --- ヘルスケア手動入力 ---
+const healthInput = document.getElementById("health-input");
+const healthSubmitBtn = document.getElementById("health-submit-btn");
+
+function applyHealthInput() {
+  const val = parseInt(healthInput.value, 10);
+  if (isNaN(val) || val < 0) {
+    healthInput.style.borderColor = "#d96c4a";
+    return;
+  }
+  healthInput.style.borderColor = "";
+  state.todaySteps = val;
+  state.healthSynced = true;
+  applySteps(state.totalSteps);
+  healthInput.value = "";
+}
+
+healthSubmitBtn.addEventListener("click", applyHealthInput);
+healthInput.addEventListener("keydown", (e) => { if (e.key === "Enter") applyHealthInput(); });
+
 els.manualStepBtn.addEventListener("click", () => addSteps(100));
 
 // --- 歩数センサー(加速度計のピーク検出) ---

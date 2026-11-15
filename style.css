@@ -107,6 +107,20 @@ main { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
   color: #2d6a4f;
   font-weight: 600;
 }
+.health-input-row { display: flex; flex-direction: column; gap: 8px; }
+.health-label { font-size: 0.9rem; font-weight: 600; color: #2b5d6b; }
+.health-row { display: flex; gap: 8px; }
+.health-row input {
+  flex: 1;
+  border: 2px solid #c9a86a;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  outline: none;
+  background: #fdf6e8;
+}
+.health-row input:focus { border-color: #2b5d6b; }
+.btn.small { padding: 10px 18px; font-size: 0.9rem; white-space: nowrap; }
 
 .visited h2 { color: #fff; font-size: 1.05rem; margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .visited-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }

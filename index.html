@@ -46,6 +46,13 @@
 
       <section class="controls">
         <p id="sync-badge" class="sync-badge">📲 未同期(手動カウント中)</p>
+        <div class="health-input-row">
+          <label class="health-label">🍎 今日の歩数を入力</label>
+          <div class="health-row">
+            <input type="number" id="health-input" placeholder="例: 8432" inputmode="numeric" min="0">
+            <button id="health-submit-btn" class="btn primary small">反映</button>
+          </div>
+        </div>
         <button id="enable-sensor-btn" class="btn primary">📡 歩数センサーを有効にする</button>
         <button id="manual-step-btn" class="btn secondary">👟 手動で歩数を追加(+100歩)</button>
         <p class="hint" id="sensor-status">センサー: 未使用(手動カウント中)</p>
