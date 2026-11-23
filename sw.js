@@ -1,4 +1,4 @@
-const CACHE_NAME = "watw-cache-v3";
+const CACHE_NAME = "watw-cache-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const ASSETS = [
   "./app.js",
   "./cities.js",
   "./map.js",
+  "./costumes.js",
   "./manifest.json",
   "./icon.svg",
   "./apple-touch-icon.png",

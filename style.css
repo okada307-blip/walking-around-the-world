@@ -228,3 +228,15 @@ main { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
   transform: rotate(4deg);
 }
 .phrase-list { list-style: none; font-size: 0.92rem; line-height: 1.6; }
+
+.costume {
+  margin: 4px 0 8px;
+  background: radial-gradient(ellipse at 50% 40%, #fff 0%, #f3e7cf 100%);
+  border: 1px solid #e2d3b3;
+  border-radius: 14px;
+  padding: 8px 8px 4px;
+  text-align: center;
+}
+.costume svg { width: 100%; max-width: 260px; height: auto; display: block; margin: 0 auto; }
+.costume figcaption { font-size: 0.8rem; color: #6b5b3f; margin-top: 2px; }
+.map-popup-card { max-height: 88vh; overflow-y: auto; }

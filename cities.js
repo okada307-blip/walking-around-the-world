@@ -176,7 +176,7 @@ function cityInfoHtml(city) {
   const phrases = city.phrases
     ? city.phrases.map(([t, r, m]) => `<li><b>${esc(t)}</b>(${esc(r)})— ${esc(m)}</li>`).join("")
     : `<li><b>${esc(city.phrase.text)}</b>(${esc(city.phrase.reading)})— ${esc(city.phrase.meaning)}</li>`;
-  let html = `
+  let html = costumeHtml(city.country) + `
     <div class="info-block"><h3>🏛 観光地</h3><p>${esc(city.sights.join(" / "))}</p></div>
     <div class="info-block"><h3>🍽 名物料理</h3><p>${esc(city.food.join(" / "))}</p></div>
     <div class="info-block"><h3>💬 現地の言葉</h3><ul class="phrase-list">${phrases}</ul></div>`;
