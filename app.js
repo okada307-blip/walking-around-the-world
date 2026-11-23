@@ -284,7 +284,7 @@ async function enableSensor() {
 
 els.enableSensorBtn.addEventListener("click", enableSensor);
 
-render();
+applySteps();
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
