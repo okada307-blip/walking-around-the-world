@@ -40,7 +40,7 @@ function buildMap(visitedCount) {
 
   // ルートライン(訪問済み都市間)
   for (let i = 0; i < visitedCount - 1; i++) {
-    const a = CITIES[i], b = CITIES[i + 1];
+    const a = ROUTE[i], b = ROUTE[i + 1];
     const line = document.createElementNS(svgNS, "line");
     line.setAttribute("x1", lngToX(a.lng));
     line.setAttribute("y1", latToY(a.lat));
@@ -54,8 +54,8 @@ function buildMap(visitedCount) {
   }
 
   // ピン表示(訪問済み都市)
-  for (let i = 0; i <= Math.min(visitedCount, CITIES.length - 1); i++) {
-    const city = CITIES[i];
+  for (let i = 0; i <= Math.min(visitedCount, ROUTE.length - 1); i++) {
+    const city = ROUTE[i];
     const cx = lngToX(city.lng);
     const cy = latToY(city.lat);
     const isLast = i === visitedCount;
@@ -103,10 +103,7 @@ function showCityPopup(city, px, py) {
   document.getElementById("popup-flag").textContent = city.flag;
   document.getElementById("popup-name").textContent = city.name;
   document.getElementById("popup-country").textContent = city.country;
-  document.getElementById("popup-sights").textContent = city.sights.join(" / ");
-  document.getElementById("popup-food").textContent = city.food.join(" / ");
-  document.getElementById("popup-phrase").textContent =
-    `${city.phrase.text}(${city.phrase.reading}) — ${city.phrase.meaning}`;
+  document.getElementById("popup-info").innerHTML = cityInfoHtml(city);
 
   popup.classList.add("show");
 }

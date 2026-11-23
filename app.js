@@ -9,7 +9,8 @@ const STORAGE_KEY = "watw_state_v2";
 //   healthSynced : 今日ヘルスケア同期済みか
 
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function loadState() {
@@ -28,7 +29,7 @@ function loadState() {
       return s;
     }
   } catch (_) {}
-  return { baseSteps: 0, todaySteps: 0, totalSteps: 0, cityIndex: 0, lastDate: today, healthSynced: false };
+  return { baseSteps: 0, todaySteps: 0, totalSteps: 0, cityIndex: 0, lastDate: today, healthSynced: false, lap: 1 };
 }
 
 function saveState() {
@@ -37,7 +38,9 @@ function saveState() {
 }
 
 let state = loadState();
+state.lap = state.lap || 1;
 state.totalSteps = (state.baseSteps || 0) + (state.todaySteps || 0);
+let ROUTE = citiesForLap(state.lap);
 
 // --- DOM refs ---
 const els = {
@@ -57,26 +60,27 @@ const els = {
   arrivalFlag: document.getElementById("arrival-flag"),
   arrivalCityName: document.getElementById("arrival-city-name"),
   arrivalCountry: document.getElementById("arrival-country"),
-  arrivalSights: document.getElementById("arrival-sights"),
-  arrivalFood: document.getElementById("arrival-food"),
-  arrivalPhrase: document.getElementById("arrival-phrase"),
+  arrivalInfo: document.getElementById("arrival-info"),
+  lapBadge: document.getElementById("lap-badge"),
+  nextLapBtn: document.getElementById("next-lap-btn"),
   closeModalBtn: document.getElementById("close-modal-btn"),
   syncBadge: document.getElementById("sync-badge"),
 };
 
 // 各都市の累積歩数しきい値を計算
-const cumulativeThresholds = (() => {
+function buildThresholds() {
   let sum = 0;
-  return CITIES.map((c, i) => {
+  return ROUTE.map((c, i) => {
     if (i === 0) return 0;
     sum += c.stepsToReach;
     return sum;
   });
-})();
+}
+let cumulativeThresholds = buildThresholds();
 
 function cityIndexFromSteps(total) {
   let idx = 0;
-  for (let i = 1; i < CITIES.length; i++) {
+  for (let i = 1; i < ROUTE.length; i++) {
     if (total >= cumulativeThresholds[i]) idx = i;
     else break;
   }
@@ -84,8 +88,8 @@ function cityIndexFromSteps(total) {
 }
 
 function render() {
-  const idx = Math.min(state.cityIndex, CITIES.length - 1);
-  const current = CITIES[idx];
+  const idx = Math.min(state.cityIndex, ROUTE.length - 1);
+  const current = ROUTE[idx];
   els.currentFlag.textContent = current.flag;
   els.currentCityName.textContent = current.name;
   els.currentCityCountry.textContent = current.country;
@@ -97,12 +101,17 @@ function render() {
     els.syncBadge.className = state.healthSynced ? "sync-badge synced" : "sync-badge";
   }
 
-  if (idx >= CITIES.length - 1) {
-    els.nextCityLabel.textContent = "🎉 世界一周達成!宮崎に帰着しました";
+  els.lapBadge.textContent = `${state.lap}周目`;
+  const finished = idx >= ROUTE.length - 1;
+  els.nextLapBtn.hidden = !finished;
+  els.nextLapBtn.textContent = `🌏 ${state.lap + 1}周目を始める`;
+
+  if (finished) {
+    els.nextCityLabel.textContent = `🎉 ${state.lap}周目の世界一周達成!宮崎に帰着しました`;
     els.progressNumbers.textContent = `合計 ${state.totalSteps.toLocaleString()} 歩`;
     els.progressFill.style.width = "100%";
   } else {
-    const next = CITIES[idx + 1];
+    const next = ROUTE[idx + 1];
     const fromThreshold = cumulativeThresholds[idx];
     const toThreshold = cumulativeThresholds[idx + 1];
     const span = toThreshold - fromThreshold;
@@ -120,7 +129,7 @@ function render() {
 function renderVisited(idx) {
   els.visitedList.innerHTML = "";
   for (let i = idx; i >= 0; i--) {
-    const c = CITIES[i];
+    const c = ROUTE[i];
     const li = document.createElement("li");
     li.innerHTML = `<span class="flag">${c.flag}</span><span>${c.name}(${c.country})</span>`;
     li.classList.add("clickable");
@@ -133,9 +142,7 @@ function showArrivalModal(city) {
   els.arrivalFlag.textContent = city.flag;
   els.arrivalCityName.textContent = city.name;
   els.arrivalCountry.textContent = city.country;
-  els.arrivalSights.textContent = city.sights.join(" / ");
-  els.arrivalFood.textContent = city.food.join(" / ");
-  els.arrivalPhrase.textContent = `${city.phrase.text}(${city.phrase.reading}) — ${city.phrase.meaning}`;
+  els.arrivalInfo.innerHTML = cityInfoHtml(city);
   els.modal.classList.add("show");
 }
 
@@ -143,12 +150,13 @@ els.closeModalBtn.addEventListener("click", () => {
   els.modal.classList.remove("show");
 });
 
-function applySteps(newTotal) {
+function applySteps() {
   const prevIdx = state.cityIndex;
-  state.cityIndex = cityIndexFromSteps(newTotal);
+  state.totalSteps = (state.baseSteps || 0) + (state.todaySteps || 0);
+  state.cityIndex = cityIndexFromSteps(state.totalSteps);
   // 新たに到達した都市があれば順番に到着モーダルを表示
   if (state.cityIndex > prevIdx) {
-    showArrivalModal(CITIES[state.cityIndex]);
+    showArrivalModal(ROUTE[state.cityIndex]);
   }
   saveState();
   render();
@@ -174,6 +182,16 @@ function checkHealthSync() {
 }
 
 checkHealthSync();
+
+els.nextLapBtn.addEventListener("click", () => {
+  const next = state.lap + 1;
+  if (!confirm(`${next}周目を始めます。現在の歩数と訪問記録はリセットされます。よろしいですか?`)) return;
+  state = { baseSteps: 0, todaySteps: 0, totalSteps: 0, cityIndex: 0, lastDate: todayStr(), healthSynced: false, lap: next };
+  ROUTE = citiesForLap(next);
+  cumulativeThresholds = buildThresholds();
+  saveState();
+  render();
+});
 
 // --- 進捗引き継ぎ ---
 const migrateInput = document.getElementById("migrate-input");

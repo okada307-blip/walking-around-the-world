@@ -17,6 +17,7 @@
 
     <main>
       <section class="passport-card">
+        <span class="lap-badge" id="lap-badge">1周目</span>
         <div class="current-city">
           <span class="flag" id="current-flag">🇯🇵</span>
           <div>
@@ -46,6 +47,7 @@
       </section>
 
       <section class="controls">
+        <button id="next-lap-btn" class="btn primary" hidden>🌏 2周目を始める</button>
         <p id="sync-badge" class="sync-badge">📲 未同期(手動カウント中)</p>
         <div class="health-input-row">
           <label class="health-label">📦 進捗を引き継ぐ</label>
@@ -91,18 +93,7 @@
           <div class="city-country" id="popup-country"></div>
         </div>
       </div>
-      <div class="info-block">
-        <h3>🏛 観光地</h3>
-        <p id="popup-sights"></p>
-      </div>
-      <div class="info-block">
-        <h3>🍽 名物料理</h3>
-        <p id="popup-food"></p>
-      </div>
-      <div class="info-block">
-        <h3>💬 現地の言葉</h3>
-        <p id="popup-phrase"></p>
-      </div>
+      <div id="popup-info"></div>
     </div>
   </div>
 
@@ -114,18 +105,7 @@
       <h2 id="arrival-city-name">City</h2>
       <p class="arrival-country" id="arrival-country">Country</p>
 
-      <div class="info-block">
-        <h3>🏛 観光地</h3>
-        <p id="arrival-sights"></p>
-      </div>
-      <div class="info-block">
-        <h3>🍽 名物料理</h3>
-        <p id="arrival-food"></p>
-      </div>
-      <div class="info-block">
-        <h3>💬 現地の言葉</h3>
-        <p id="arrival-phrase"></p>
-      </div>
+      <div id="arrival-info"></div>
 
       <button id="close-modal-btn" class="btn primary">旅を続ける</button>
     </div>
